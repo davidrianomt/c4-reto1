@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Login</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<!-- vinculo a bootstrap -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+		integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<!-- Temas-->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+		integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+	<!-- se vincula al hoja de estilo para definir el aspecto del formulario de login-->
+	<link rel="stylesheet" type="text/css" href="estilo.css">
+</head>
+
+<body>
+	<iframe name="frame"></iframe>
+	<div id="Contenedor">
+		<div align="center">
+			<h1 align="center">Iniciar Sesión</h1>
+		</div>
+		<hr>
+		<div class="alerta"></div>
+
+		<div class="ContentForm">
+			<form id="form" target="frame">
+				<div class="input-group input-group-lg">
+					<span class="input-group-addon" id="sizing-addon1"><i
+							class="glyphicon glyphicon-envelope"></i></span>
+					<input type="email" class="form-control" name="correo" placeholder="correo@dominio.com" id="correo"
+						aria-describedby="sizing-addon1" required maxlength="50">
+				</div>
+				<br>
+				<div class="input-group input-group-lg">
+					<span class="input-group-addon" id="sizing-addon1"><i class="glyphicon glyphicon-lock"></i></span>
+					<input type="password" name="contra" id="contra" class="form-control" placeholder="********"
+						aria-describedby="sizing-addon1" required maxlength="50">
+				</div>
+				<br>
+				<button class="btn btn-lg btn-primary btn-block btn-signin" id="IngresoLog"
+					type="submit">Entrar</button>
+				<div class="opcioncontra">¿No tienes cuenta? <a href="registro.html">Crea tu cuenta aquí</a></div>
+			</form>
+		</div>
+	</div>
+
+</body>
+<!-- vinculando a libreria Jquery-->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<!-- Libreria java scritp de bootstrap -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+	integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+	crossorigin="anonymous"></script>
+
+<script type="text/javascript" src="Javascript.js"></script>
+
+<script>
+	$(document).on("click", "#IngresoLog", Logica);
+	function Logica() {
+		var correo = $("#correo").val();
+		var password = $("#contra").val();
+
+		if ($("#correo").val() == "" || $("#contra").val() == "") {
+			alert("Todos los campos son obligatorios.");
+		}
+		else {
+			$.ajax({
+				url: 'http://140.238.183.157:8080/api/user/all',
+				type: 'GET',
+				dataType: 'json',
+				statusCode: {
+					200: function (response) {
+						console.log("200");
+
+						console.log(response);
+						if (response.length == 0) {
+							var alerta = "<div class=\"alert alert-warning alert-dismissible\"><a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>    <strong>Error!!</strong> Error de autenticación.</div>";
+							$(".alerta").html(alerta);
+							console.log("false");
+						}
+						encontrado = false;
+						response.forEach(function (item) {
+							if (encontrado == false) {
+								console.log(correo, "==", item.email);
+								console.log(password, "==", item.password);
+								if (item.email == correo && item.password == password) {
+									var alerta = "<div class=\"alert alert-success alert-dismissible\"><a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>    <strong>Correcto!</strong> Autenticado como " + item.name + "</div>";
+									$(".alerta").html(alerta);
+									encontrado = true;
+									console.log("true");
+									return;
+								}
+								else {
+									var alerta = "<div class=\"alert alert-warning alert-dismissible\"><a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>    <strong>Error!</strong> Error de autenticación.</div>";
+									$(".alerta").html(alerta);
+									console.log("false");
+									encontrado = false;
+								}
+							}
+
+
+						});
+					}
+
+				},
+				success: function (response) {
+					console.log("SUCCESS");
+					//console.log(response);
+				},
+				error: function (xhr, status) {
+					console.log("ERROR");
+					//console.log(xhr.responseText);
+					var alerta = "<div class=\"alert alert-warning alert-dismissible\"><a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>    <strong>Error!</strong> Registro No fue Ingreresado correctamente.</div>";
+					$(".alerta").html(alerta);
+				},
+				complete: function (xhr, status) {
+					console.log("COMPLETE");
+					//console.log(xhr.responseText);
+				}
+			});
+		}
+	}
+</script>
+
+</html>
